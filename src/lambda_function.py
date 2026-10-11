@@ -45,18 +45,19 @@ except Exception as e:
 
 
 def _get_boto3_clients():
-    """Create standard boto3 clients with retry configuration."""
+    """Create standard boto3 clients with retry configuration bound to target region."""
+    region_name = os.environ.get("AWS_REGION") or None
     retry_config = Config(
         retries={"max_attempts": 3, "mode": "standard"},
         connect_timeout=10,
         read_timeout=30
     )
-    session = boto3.Session()
+    session = boto3.Session(region_name=region_name)
     return {
-        "connect": session.client("connect", config=retry_config),
-        "service_quotas": session.client("service-quotas", config=retry_config),
-        "cloudwatch": session.client("cloudwatch", config=retry_config),
-        "sns": session.client("sns", config=retry_config)
+        "connect": session.client("connect", config=retry_config, region_name=region_name),
+        "service_quotas": session.client("service-quotas", config=retry_config, region_name=region_name),
+        "cloudwatch": session.client("cloudwatch", config=retry_config, region_name=region_name),
+        "sns": session.client("sns", config=retry_config, region_name=region_name)
     }
 
 
@@ -70,6 +71,13 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     threshold_pct = float(os.environ.get("THRESHOLD_PERCENTAGE", "80.0"))
     sns_topic_arn = os.environ.get("SNS_TOPIC_ARN", "")
     target_instance_id = os.environ.get("CONNECT_INSTANCE_ID", "").strip() or None
+
+    if not target_instance_id:
+        logger.error("CONNECT_INSTANCE_ID environment variable is required to monitor a targeted instance.")
+        return {
+            "statusCode": 400,
+            "error": "Missing required CONNECT_INSTANCE_ID environment variable. Please configure the target Amazon Connect instance ID."
+        }
 
     clients = _get_boto3_clients()
 

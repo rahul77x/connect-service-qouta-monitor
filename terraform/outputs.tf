@@ -2,6 +2,16 @@
 # Terraform Outputs
 # ==============================================================================
 
+output "target_connect_instance_id" {
+  description = "Target Amazon Connect Instance ID being monitored"
+  value       = var.connect_instance_id
+}
+
+output "monitored_region" {
+  description = "Target AWS region being monitored"
+  value       = var.aws_region
+}
+
 output "sns_topic_arn" {
   description = "ARN of the SNS topic for service quota alerts"
   value       = aws_sns_topic.quota_alerts.arn

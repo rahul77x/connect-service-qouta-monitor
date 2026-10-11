@@ -1,14 +1,14 @@
 # ==============================================================================
 # Amazon CloudWatch Custom Dashboard (Bank IAM & SSO Compliant)
-# Zero external web hosting, zero S3 public buckets, zero CloudFront
+# Scoped strictly to the targeted Amazon Connect instance in the specified region
 # ==============================================================================
 
 resource "aws_cloudwatch_dashboard" "connect_quotas" {
-  dashboard_name = "${var.project_name}-${var.environment}"
+  dashboard_name = "${var.project_name}-${var.environment}-${var.connect_instance_id}"
 
   dashboard_body = jsonencode({
     widgets = [
-      # 1. Header Banner & Instructions
+      # 1. Header Banner & Target Scope
       {
         type   = "text"
         x      = 0
@@ -16,7 +16,7 @@ resource "aws_cloudwatch_dashboard" "connect_quotas" {
         width  = 24
         height = 2
         properties = {
-          markdown = "## 📞 Amazon Connect Service Quota Operations Dashboard (${upper(var.environment)})\n**Real-time telephony concurrency, API rate limits (TPS), and capacity headroom.** | Region: `${var.aws_region}` | Warning Threshold: `${var.threshold_percentage}%`"
+          markdown = "## 📞 Amazon Connect Service Quota Dashboard (${upper(var.environment)})\n**Target Instance:** `${var.connect_instance_id}` | **Region:** `${var.aws_region}` | **Warning Threshold:** `${var.threshold_percentage}%`"
         }
       },
 
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_dashboard" "connect_quotas" {
         width  = 24
         height = 3
         properties = {
-          title = "Active Quota & Telephony Health Status"
+          title = "Active Health & Telephony Alarm Status"
           alarms = [
             aws_cloudwatch_metric_alarm.calls_breaching_quota.arn,
             aws_cloudwatch_metric_alarm.throttled_calls.arn,
@@ -46,12 +46,13 @@ resource "aws_cloudwatch_dashboard" "connect_quotas" {
         height = 6
         properties = {
           view    = "gauge"
-          title   = "Peak Quota Utilization (%)"
+          title   = "Peak Quota Utilization (%) - Target Instance"
           region  = var.aws_region
           metrics = [
             [
               "AmazonConnect/ServiceQuotas",
               "QuotaUtilizationPercent",
+              "InstanceId", var.connect_instance_id,
               {
                 "stat"   = "Maximum"
                 "period" = 300
@@ -92,12 +93,13 @@ resource "aws_cloudwatch_dashboard" "connect_quotas" {
         properties = {
           view    = "timeSeries"
           stacked = false
-          title   = "Real-Time Active Concurrent Calls (1-Minute Resolution)"
+          title   = "Real-Time Active Concurrent Calls (Instance: ${var.connect_instance_id})"
           region  = var.aws_region
           metrics = [
             [
               "AWS/Connect",
               "ConcurrentCalls",
+              "InstanceId", var.connect_instance_id,
               {
                 "stat"   = "Maximum"
                 "period" = 60
@@ -108,6 +110,7 @@ resource "aws_cloudwatch_dashboard" "connect_quotas" {
             [
               "AWS/Connect",
               "CallsBreachingConcurrencyQuota",
+              "InstanceId", var.connect_instance_id,
               {
                 "stat"   = "Sum"
                 "period" = 60
@@ -192,7 +195,7 @@ resource "aws_cloudwatch_dashboard" "connect_quotas" {
         }
       },
 
-      # 6. Static Resource Allocations (Bar Chart)
+      # 6. Static Resource Allocations for Target Instance (Bar Chart)
       {
         type   = "metric"
         x      = 12
@@ -202,26 +205,30 @@ resource "aws_cloudwatch_dashboard" "connect_quotas" {
         properties = {
           view    = "bar"
           stacked = false
-          title   = "Connect Resource Allocations (Current Count)"
+          title   = "Resource Allocations (Instance: ${var.connect_instance_id})"
           region  = var.aws_region
           metrics = [
             [
               "AmazonConnect/ServiceQuotas", "QuotaUsage",
+              "InstanceId", var.connect_instance_id,
               "QuotaName", "Phone numbers per instance",
               { "stat" = "Maximum", "period" = 300, "label" = "Phone Numbers" }
             ],
             [
               "AmazonConnect/ServiceQuotas", "QuotaUsage",
+              "InstanceId", var.connect_instance_id,
               "QuotaName", "Contact flows per instance",
               { "stat" = "Maximum", "period" = 300, "label" = "Contact Flows" }
             ],
             [
               "AmazonConnect/ServiceQuotas", "QuotaUsage",
+              "InstanceId", var.connect_instance_id,
               "QuotaName", "Queues per instance",
               { "stat" = "Maximum", "period" = 300, "label" = "Queues" }
             ],
             [
               "AmazonConnect/ServiceQuotas", "QuotaUsage",
+              "InstanceId", var.connect_instance_id,
               "QuotaName", "Routing profiles per instance",
               { "stat" = "Maximum", "period" = 300, "label" = "Routing Profiles" }
             ]
@@ -235,7 +242,7 @@ resource "aws_cloudwatch_dashboard" "connect_quotas" {
         }
       },
 
-      # 7. Summary Table of All Quotas Utilization
+      # 7. Summary Table for Target Instance
       {
         type   = "metric"
         x      = 0
@@ -244,19 +251,22 @@ resource "aws_cloudwatch_dashboard" "connect_quotas" {
         height = 6
         properties = {
           view    = "table"
-          title   = "All Connect Quotas - Latest Utilization & Headroom Table"
+          title   = "Instance Quotas - Latest Utilization & Headroom Table"
           region  = var.aws_region
           metrics = [
             [
               "AmazonConnect/ServiceQuotas", "QuotaUtilizationPercent",
+              "InstanceId", var.connect_instance_id,
               { "stat" = "Maximum", "period" = 300, "label" = "Utilization %" }
             ],
             [
               "AmazonConnect/ServiceQuotas", "QuotaUsage",
+              "InstanceId", var.connect_instance_id,
               { "stat" = "Maximum", "period" = 300, "label" = "Usage Count" }
             ],
             [
               "AmazonConnect/ServiceQuotas", "QuotaLimit",
+              "InstanceId", var.connect_instance_id,
               { "stat" = "Maximum", "period" = 300, "label" = "Limit Ceiling" }
             ]
           ]
@@ -265,4 +275,3 @@ resource "aws_cloudwatch_dashboard" "connect_quotas" {
     ]
   })
 }
-

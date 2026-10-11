@@ -11,7 +11,8 @@ class TestLambdaFunction(unittest.TestCase):
     @patch.dict(os.environ, {
         "THRESHOLD_PERCENTAGE": "80",
         "SNS_TOPIC_ARN": "arn:aws:sns:us-east-1:123456789012:test-topic",
-        "CONNECT_INSTANCE_ID": ""
+        "CONNECT_INSTANCE_ID": "inst-1",
+        "AWS_REGION": "us-east-1"
     })
     @patch("src.lambda_function._get_boto3_clients")
     def test_lambda_handler_success(self, mock_get_clients):
@@ -27,29 +28,27 @@ class TestLambdaFunction(unittest.TestCase):
             "sns": mock_sns
         }
 
-        # Mock list_instances
-        mock_paginator_inst = MagicMock()
-        mock_paginator_inst.paginate.return_value = [
-            {"InstanceSummaryList": [{"Id": "inst-1", "InstanceAlias": "BankProd"}]}
-        ]
+        # Mock describe_instance for targeted instance
+        mock_connect.describe_instance.return_value = {
+            "Instance": {
+                "Id": "inst-1",
+                "Arn": "arn:aws:connect:us-east-1:123:instance/inst-1",
+                "InstanceAlias": "BankProd",
+                "InstanceStatus": "ACTIVE"
+            }
+        }
 
         # Mock list_queues etc.
         mock_paginator_generic = MagicMock()
         mock_paginator_generic.paginate.return_value = [
             {"QueueSummaryList": [{"Id": "q1"}]}
         ]
-
-        def get_paginator_side_effect(api_name):
-            if api_name == "list_instances":
-                return mock_paginator_inst
-            return mock_paginator_generic
-
-        mock_connect.get_paginator.side_effect = get_paginator_side_effect
+        mock_connect.get_paginator.return_value = mock_paginator_generic
 
         # Mock service quotas
         mock_sq_paginator = MagicMock()
         mock_sq_paginator.paginate.return_value = [
-            {"Quotas": [{"QuotaCode": "L-28B936FD", "Value": 50.0}]}
+            {"Quotas": [{"QuotaCode": "L-28B936FD", "QuotaName": "Active concurrent calls", "Value": 50.0, "Unit": "Count"}]}
         ]
         mock_sq.get_paginator.return_value = mock_sq_paginator
 
@@ -66,7 +65,16 @@ class TestLambdaFunction(unittest.TestCase):
         self.assertGreater(result["metrics_pushed_to_cloudwatch"], 0)
         self.assertTrue(mock_cw.put_metric_data.called)
 
+    @patch.dict(os.environ, {
+        "THRESHOLD_PERCENTAGE": "80",
+        "SNS_TOPIC_ARN": "arn:aws:sns:us-east-1:123456789012:test-topic",
+        "CONNECT_INSTANCE_ID": ""
+    })
+    def test_lambda_handler_missing_instance_id(self):
+        result = lambda_handler({}, None)
+        self.assertEqual(result["statusCode"], 400)
+        self.assertIn("CONNECT_INSTANCE_ID", result["error"])
+
 
 if __name__ == "__main__":
     unittest.main()
-

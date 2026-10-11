@@ -150,13 +150,13 @@ cp terraform.tfvars.example terraform.tfvars
 
 Edit `terraform.tfvars`:
 ```hcl
-aws_region           = "us-east-1"
+aws_region           = "us-east-1"  # Target region where your Connect instance is deployed
 environment          = "prod"
 threshold_percentage = 80
 schedule_expression  = "rate(15 minutes)"
 
-# Leave empty to auto-discover all instances, or specify a specific instance ID:
-connect_instance_id  = ""
+# Target Amazon Connect Instance ID (UUID) or ARN:
+connect_instance_id  = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 ```
 
 ### Step 2: Initialize & Deploy

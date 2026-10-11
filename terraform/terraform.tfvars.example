@@ -15,8 +15,8 @@ project_name = "connect-quota-monitor"
 # Warning threshold percentage (triggers SNS alert when utilization >= this value)
 threshold_percentage = 80
 
-# (Optional) Target Connect Instance ID. If left empty "", all instances in the region are monitored.
-connect_instance_id = ""
+# Target Amazon Connect Instance ID (UUID) or ARN to monitor in the selected region
+connect_instance_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
 # Scan schedule frequency (e.g. rate(15 minutes), rate(30 minutes), rate(1 hour))
 schedule_expression = "rate(15 minutes)"

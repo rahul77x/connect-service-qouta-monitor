@@ -28,9 +28,13 @@ variable "threshold_percentage" {
 }
 
 variable "connect_instance_id" {
-  description = "Optional specific Amazon Connect instance ID or ARN. If empty, the monitor auto-discovers all instances in the region."
+  description = "Target Amazon Connect instance ID (UUID) or ARN to monitor in the specified region"
   type        = string
-  default     = ""
+
+  validation {
+    condition     = length(trimspace(var.connect_instance_id)) > 0
+    error_message = "connect_instance_id must not be empty. Please specify your target Amazon Connect Instance ID or ARN."
+  }
 }
 
 variable "schedule_expression" {
