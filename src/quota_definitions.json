@@ -1,0 +1,149 @@
+{
+  "L-AA17A6B9": {
+    "name": "Amazon Connect instance count",
+    "category": "CORE_CONNECT",
+    "scope": "ACCOUNT",
+    "method": "api_count",
+    "service": "connect",
+    "api": "list_instances",
+    "default_limit": 2,
+    "unit": "Count",
+    "description": "Maximum number of Amazon Connect instances per account"
+  },
+  "L-28B936FD": {
+    "name": "Active concurrent voice calls",
+    "category": "TELEPHONY",
+    "scope": "INSTANCE",
+    "method": "cloudwatch",
+    "service": "connect",
+    "metric_namespace": "AWS/Connect",
+    "metric_name": "ConcurrentCalls",
+    "default_limit": 50,
+    "unit": "Count",
+    "description": "Active concurrent calls in an Amazon Connect instance"
+  },
+  "L-E573B7E9": {
+    "name": "Active concurrent chats",
+    "category": "CHANNELS",
+    "scope": "INSTANCE",
+    "method": "cloudwatch",
+    "service": "connect",
+    "metric_namespace": "AWS/Connect",
+    "metric_name": "ActiveChats",
+    "default_limit": 100,
+    "unit": "Count",
+    "description": "Active concurrent chat contacts per instance"
+  },
+  "L-515FE427": {
+    "name": "Active concurrent tasks",
+    "category": "CHANNELS",
+    "scope": "INSTANCE",
+    "method": "cloudwatch",
+    "service": "connect",
+    "metric_namespace": "AWS/Connect",
+    "metric_name": "ConcurrentTasks",
+    "default_limit": 500,
+    "unit": "Count",
+    "description": "Active concurrent task contacts per instance"
+  },
+  "L-89FE583B": {
+    "name": "Phone numbers per instance",
+    "category": "TELEPHONY",
+    "scope": "INSTANCE",
+    "method": "api_count",
+    "service": "connect",
+    "api": "list_phone_numbers_v2",
+    "default_limit": 200,
+    "unit": "Count",
+    "description": "Claimed phone numbers per instance"
+  },
+  "L-B67B713A": {
+    "name": "Contact flows per instance",
+    "category": "FLOWS",
+    "scope": "INSTANCE",
+    "method": "api_count",
+    "service": "connect",
+    "api": "list_contact_flows",
+    "default_limit": 500,
+    "unit": "Count",
+    "description": "Published and draft contact flows per instance"
+  },
+  "L-0304675A": {
+    "name": "Queues per instance",
+    "category": "ROUTING",
+    "scope": "INSTANCE",
+    "method": "api_count",
+    "service": "connect",
+    "api": "list_queues",
+    "default_limit": 100,
+    "unit": "Count",
+    "description": "Standard and agent queues per instance"
+  },
+  "L-7CAAC8DF": {
+    "name": "Routing profiles per instance",
+    "category": "ROUTING",
+    "scope": "INSTANCE",
+    "method": "api_count",
+    "service": "connect",
+    "api": "list_routing_profiles",
+    "default_limit": 100,
+    "unit": "Count",
+    "description": "Routing profiles per instance"
+  },
+  "L-47EE3561": {
+    "name": "Hours of operation per instance",
+    "category": "ROUTING",
+    "scope": "INSTANCE",
+    "method": "api_count",
+    "service": "connect",
+    "api": "list_hours_of_operations",
+    "default_limit": 100,
+    "unit": "Count",
+    "description": "Hours of operation configurations per instance"
+  },
+  "L-D269D71F": {
+    "name": "Rate of GetContactAttributes API requests",
+    "category": "API_RATE_LIMITS",
+    "scope": "INSTANCE",
+    "method": "cloudwatch_api",
+    "service": "connect",
+    "api_resource": "GetContactAttributes",
+    "default_limit": 100,
+    "unit": "TPS",
+    "description": "Transactions per second for GetContactAttributes"
+  },
+  "L-FB0E0AC8": {
+    "name": "Rate of UpdateContactAttributes API requests",
+    "category": "API_RATE_LIMITS",
+    "scope": "INSTANCE",
+    "method": "cloudwatch_api",
+    "service": "connect",
+    "api_resource": "UpdateContactAttributes",
+    "default_limit": 100,
+    "unit": "TPS",
+    "description": "Transactions per second for UpdateContactAttributes"
+  },
+  "L-44670DDF": {
+    "name": "Rate of StartOutboundVoiceContact API requests",
+    "category": "API_RATE_LIMITS",
+    "scope": "INSTANCE",
+    "method": "cloudwatch_api",
+    "service": "connect",
+    "api_resource": "StartOutboundVoiceContact",
+    "default_limit": 20,
+    "unit": "TPS",
+    "description": "Transactions per second for StartOutboundVoiceContact"
+  },
+  "L-C4C4FECE": {
+    "name": "Rate of DescribeContact API requests",
+    "category": "API_RATE_LIMITS",
+    "scope": "INSTANCE",
+    "method": "cloudwatch_api",
+    "service": "connect",
+    "api_resource": "DescribeContact",
+    "default_limit": 50,
+    "unit": "TPS",
+    "description": "Transactions per second for DescribeContact"
+  }
+}
+

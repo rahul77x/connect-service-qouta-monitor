@@ -1,0 +1,34 @@
+# ==============================================================================
+# Amazon Connect Service Quota Monitor - Terraform Variables Example
+# Copy this file to `terraform.tfvars` and customize for your environment.
+# ==============================================================================
+
+# AWS Region where your Amazon Connect instance(s) live
+aws_region = "us-east-1"
+
+# Environment name tag (dev, staging, prod)
+environment = "prod"
+
+# Project naming prefix
+project_name = "connect-quota-monitor"
+
+# Warning threshold percentage (triggers SNS alert when utilization >= this value)
+threshold_percentage = 80
+
+# (Optional) Target Connect Instance ID. If left empty "", all instances in the region are monitored.
+connect_instance_id = ""
+
+# Scan schedule frequency (e.g. rate(15 minutes), rate(30 minutes), rate(1 hour))
+schedule_expression = "rate(15 minutes)"
+
+# CloudWatch logs retention period in days
+log_retention_days = 30
+
+# Custom resource tags
+tags = {
+  Project     = "Amazon Connect Service Quota Monitor"
+  Environment = "Production"
+  ManagedBy   = "Terraform"
+  CostCenter  = "Telephony-Operations"
+}
+
