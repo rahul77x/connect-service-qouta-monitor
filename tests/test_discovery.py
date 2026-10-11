@@ -61,7 +61,7 @@ class TestConnectDiscovery(unittest.TestCase):
         self.assertEqual(instances[0]["id"], "inst-1")
         self.assertEqual(instances[1]["id"], "inst-2")
 
-    def test_fetch_service_quotas(self):
+    def test_fetch_all_service_quotas(self):
         mock_connect = MagicMock()
         mock_sq = MagicMock()
 
@@ -69,18 +69,19 @@ class TestConnectDiscovery(unittest.TestCase):
         mock_paginator.paginate.return_value = [
             {
                 "Quotas": [
-                    {"QuotaCode": "L-AA17A6B9", "Value": 5.0},
-                    {"QuotaCode": "L-28B936FD", "Value": 100.0}
+                    {"QuotaCode": "L-AA17A6B9", "QuotaName": "Connect instances", "Value": 5.0, "Unit": "Count"},
+                    {"QuotaCode": "L-28B936FD", "QuotaName": "Active concurrent voice calls", "Value": 100.0, "Unit": "Count"}
                 ]
             }
         ]
         mock_sq.get_paginator.return_value = mock_paginator
 
         discovery = ConnectDiscovery(mock_connect, mock_sq)
-        limits = discovery.fetch_service_quotas(service_code="connect")
+        catalog = discovery.fetch_all_service_quotas(service_codes=["connect"])
 
-        self.assertEqual(limits["L-AA17A6B9"], 5.0)
-        self.assertEqual(limits["L-28B936FD"], 100.0)
+        self.assertIn("L-AA17A6B9", catalog)
+        self.assertEqual(catalog["L-AA17A6B9"]["limit"], 5.0)
+        self.assertEqual(catalog["L-28B936FD"]["limit"], 100.0)
 
 
 if __name__ == "__main__":

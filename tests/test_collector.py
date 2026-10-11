@@ -66,7 +66,7 @@ class TestQuotaCollector(unittest.TestCase):
 
         results = collector.collect_all_quotas(
             instances=instances,
-            quota_limits=quota_limits,
+            quota_catalog=quota_limits,
             threshold_percentage=80.0
         )
 

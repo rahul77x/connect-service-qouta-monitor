@@ -8,7 +8,7 @@ Designed specifically for enterprise and financial services AWS accounts where h
 
 ## 🏛️ Why This Architecture?
 
-| Concern | Reference Sample Repo | Our Bank-Compliant Architecture |
+| Concern | Original AWS Sample Repo (sample-amazon-connect-...) | This Repository (Bank-Compliant Architecture) |
 |---|---|---|
 | **Dashboard Hosting** | Private S3 + CloudFront + Lambda@Edge + Cognito Hosted UI | **Native Amazon CloudWatch Dashboard** inside AWS Console |
 | **Authentication & IAM** | Custom Cognito User Pool & Edge Auth in `us-east-1` | **Existing Corporate SSO & IAM Roles** (AWS IAM Identity Center, Okta, Azure AD) |
@@ -49,23 +49,37 @@ flowchart TD
 
 ---
 
-## 📊 Monitored Quotas & Measurement Methods
+---
 
-| Quota Code | Quota Name | Measurement Method | Data Source |
-|---|---|---|---|
-| `L-AA17A6B9` | Amazon Connect instance count | `api_count` | `connect:ListInstances` |
-| `L-28B936FD` | Active concurrent voice calls | `cloudwatch` (1-min) | `AWS/Connect:ConcurrentCalls` |
-| `L-E573B7E9` | Active concurrent chats | `cloudwatch` (1-min) | `AWS/Connect:ActiveChats` |
-| `L-515FE427` | Active concurrent tasks | `cloudwatch` (1-min) | `AWS/Connect:ConcurrentTasks` |
-| `L-89FE583B` | Phone numbers per instance | `api_count` | `connect:ListPhoneNumbersV2` |
-| `L-B67B713A` | Contact flows per instance | `api_count` | `connect:ListContactFlows` |
-| `L-0304675A` | Queues per instance | `api_count` | `connect:ListQueues` |
-| `L-7CAAC8DF` | Routing profiles per instance | `api_count` | `connect:ListRoutingProfiles` |
-| `L-47EE3561` | Hours of operation per instance | `api_count` | `connect:ListHoursOfOperations` |
-| `L-D269D71F` | `GetContactAttributes` API rate | `cloudwatch_api` (TPS) | `AWS/Usage:CallCount / 60` |
-| `L-FB0E0AC8` | `UpdateContactAttributes` API rate | `cloudwatch_api` (TPS) | `AWS/Usage:CallCount / 60` |
-| `L-44670DDF` | `StartOutboundVoiceContact` API rate | `cloudwatch_api` (TPS) | `AWS/Usage:CallCount / 60` |
-| `L-C4C4FECE` | `DescribeContact` API rate | `cloudwatch_api` (TPS) | `AWS/Usage:CallCount / 60` |
+## 📊 Monitored Quotas & Covered Services
+
+The monitor covers **all quotas across Amazon Connect and its related service ecosystem**, combining a pre-mapped catalog of **112 baseline quotas** with **dynamic Service Quotas discovery** across all Connect-family services.
+
+### Supported Services
+
+| Service | Code | Quotas Monitored |
+|---|---|---|
+| **Amazon Connect Core** | `connect` | Telephony concurrency, phone numbers, contact flows, modules, users, security profiles, hierarchy groups, queues, routing profiles, quick connects, agent statuses, prompts, predefined attributes |
+| **Connect API Rate Limits** | `connect` | 40+ high-frequency APIs monitored in real-time TPS (`GetContactAttributes`, `UpdateContactAttributes`, `StartOutboundVoiceContact`, `SearchContacts`, `GetMetricDataV2`, etc.) |
+| **Amazon Connect Cases** | `connectcases` | Case domains, fields, templates, layouts, related items, and API rate limits |
+| **Outbound Campaigns** | `connectcampaigns` | Active campaigns, dial requests, and campaign concurrency limits |
+| **Connect Participant** | `connect-participant` | Real-time participant chat connection rates, streaming, and messaging APIs |
+| **Customer Profiles** | `profile` | Profile domains, object types, search queries, and integration associations |
+| **Amazon Q in Connect (Wisdom)** | `wisdom` | Knowledge bases, assistant associations, content uploads, and query rates |
+| **Amazon Connect Voice ID** | `voiceid` | Voice ID domains, speaker enrollments, watchlist evaluations, and API limits |
+| **Amazon AppIntegrations** | `appintegrations` | Event integrations, data integrations, applications, and file transfer quotas |
+
+### Quota Categories in Catalog (112 Baseline Definitions)
+
+- **`CORE_CONNECT` (13):** Instance count, users, security profiles, hierarchy groups, phone numbers, contact flows, flow modules, predefined attributes, external voice transfer connectors.
+- **`CONTACT_HANDLING` (6):** Concurrent voice calls, active chats, concurrent tasks, concurrent emails, campaign calls.
+- **`ROUTING_QUEUES` (6):** Queues, routing profiles, quick connects, agent statuses, queues per routing profile.
+- **`API_RATE_LIMITS` (40):** Per-second Transaction Per Second (TPS) quotas across all Connect APIs derived from `AWS/Usage:CallCount / 60`.
+- **`FORECASTING_CAPACITY` (28):** Forecasting groups, schedules, agents per schedule, capacity planning.
+- **`INTEGRATIONS` (11):** Lambda function associations, Lex bots, application integrations, event integrations.
+- **`CONTACT_LENS` (5):** Post-call analytics jobs, chat analytics jobs, automated interaction analytics.
+- **`REPORTING` (3):** Saved reports, scheduled reports, external recording sessions.
+- **Dynamic Layer 1:** Any new or unlisted quota added to the Connect service family by AWS is automatically discovered at runtime from Service Quotas and tracked.
 
 ---
 

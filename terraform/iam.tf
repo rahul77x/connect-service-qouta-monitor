@@ -54,18 +54,25 @@ resource "aws_iam_policy" "lambda_policy" {
         Resource = "*"
       },
 
-      # Amazon Connect Discovery and Resource Counting
+      # Amazon Connect Family Discovery and Resource Counting
       {
-        Sid    = "ConnectReadOnly"
+        Sid    = "ConnectFamilyReadOnly"
         Effect = "Allow"
         Action = [
-          "connect:ListInstances",
-          "connect:DescribeInstance",
-          "connect:ListQueues",
-          "connect:ListRoutingProfiles",
-          "connect:ListContactFlows",
-          "connect:ListPhoneNumbersV2",
-          "connect:ListHoursOfOperations"
+          "connect:List*",
+          "connect:Describe*",
+          "connectcases:List*",
+          "connectcases:Get*",
+          "connectcampaigns:List*",
+          "connectcampaigns:Get*",
+          "profile:List*",
+          "profile:Get*",
+          "wisdom:List*",
+          "wisdom:Get*",
+          "voiceid:List*",
+          "voiceid:Describe*",
+          "appintegrations:List*",
+          "appintegrations:Get*"
         ]
         Resource = "*"
       },

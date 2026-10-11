@@ -87,7 +87,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             "instances_monitored": 0
         }
 
-    quota_limits = discovery.fetch_service_quotas(service_code="connect")
+    quota_catalog = discovery.fetch_all_service_quotas()
 
     # 2. Collection
     collector = QuotaCollector(
@@ -97,7 +97,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     )
     records = collector.collect_all_quotas(
         instances=instances,
-        quota_limits=quota_limits,
+        quota_catalog=quota_catalog,
         threshold_percentage=threshold_pct
     )
 
